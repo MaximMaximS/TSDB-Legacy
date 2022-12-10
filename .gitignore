@@ -102,5 +102,4 @@ dist
 # TernJS port file
 .tern-port
 
-modules/ga_data/*
-!modules/ga_data/README.md
+utils/data/
