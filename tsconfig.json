@@ -1,0 +1,11 @@
+{
+  "extends": "@tsconfig/node18-strictest/tsconfig.json",
+  "ts-node": {
+    "files": true
+  },
+  "compilerOptions": {
+    "outDir": "./dist" /* Specify an output folder for all emitted files. */,
+    "removeComments": true /* Disable emitting comments. */,
+    "newLine": "lf" /* Set the newline character for emitting files. */
+  }
+}
