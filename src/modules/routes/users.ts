@@ -10,3 +10,11 @@ export async function registerRoute(req: Request, res: Response) {
   await User.create({ username, password });
   res.sendStatus(201);
 }
+
+export function watchedRoute(req: Request, res: Response) {
+  const user = req.user;
+  if (user === undefined) {
+    throw new NotFoundError();
+  }
+  res.json({ watched: user.watched.length });
+}

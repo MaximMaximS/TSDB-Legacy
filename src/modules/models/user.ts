@@ -1,10 +1,10 @@
 import bcrypt from "bcryptjs";
-import { Model, Schema, model } from "mongoose";
+import { Document, Model, Schema, Types, model } from "mongoose";
 import idValidator from "mongoose-id-validator2";
 import uniqueValidator from "mongoose-unique-validator";
 import { ValidatorError } from "../errors";
 
-interface IUser {
+export interface IUser {
   username: string;
   password: string;
   watched: number[];
@@ -33,6 +33,14 @@ const UserSchema = new Schema<IUser, UserModel, IUserMethods>(
       type: String,
       required: true,
     },
+    watched: [
+      {
+        type: Number,
+        ref: "Episode",
+        required: true,
+        default: [],
+      },
+    ],
   },
   { timestamps: true }
 );
@@ -58,5 +66,8 @@ UserSchema.pre("save", function (next) {
 UserSchema.method<IUser>("isValidPassword", function (password: string) {
   return bcrypt.compareSync(password, this.password);
 });
+
+export type UserType = Document<unknown, unknown, IUser> &
+  IUser & { _id: Types.ObjectId } & IUserMethods;
 
 export default model<IUser, UserModel>("User", UserSchema, "users");
