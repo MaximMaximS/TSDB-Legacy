@@ -147,8 +147,8 @@ function convDate(date: string) {
 
 interface Episode {
   _id: number;
-  seasonId: number;
-  inSeasonId: number;
+  season: number;
+  episode: number;
   name: {
     en: string;
     cs: string;
@@ -277,10 +277,10 @@ async function processRow(row: Element, season: number) {
 
   const plot = await getPlot(id.toString(), url);
 
-  const episode: Episode = {
+  const episodeObj: Episode = {
     _id: id,
-    seasonId: season,
-    inSeasonId: eNo,
+    season,
+    episode: eNo,
     name: {
       en: enName,
       cs: csName,
@@ -296,7 +296,7 @@ async function processRow(row: Element, season: number) {
       cs: plot,
     },
   };
-  return episode;
+  return episodeObj;
 }
 
 function processTable(table: Element, season: number) {
