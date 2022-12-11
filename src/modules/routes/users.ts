@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import User from "../models/user";
-import { NotFoundError } from "../errors";
+import { NotFoundError, ServerError } from "../errors";
 
 export async function registerRoute(req: Request, res: Response) {
   if (process.env["NODE_ENV"] !== "development") {
@@ -17,4 +17,11 @@ export function watchedRoute(req: Request, res: Response) {
     throw new NotFoundError();
   }
   res.json({ watched: user.watched.length });
+}
+
+export function loginRoute(req: Request, res: Response) {
+  if (req.user === undefined) {
+    throw new ServerError("User not found");
+  }
+  res.json({ username: req.user.username });
 }
