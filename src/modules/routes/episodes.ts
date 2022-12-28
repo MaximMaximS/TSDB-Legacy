@@ -1,30 +1,48 @@
 import type { Request, Response } from "express";
 import Episode from "../models/episode";
 import { NotFoundError, ServerError, ValidatorError } from "../errors";
-import { escapeRegExp, string } from "../utils";
+import { escapeRegExp, number, string } from "../utils";
 
 export async function searchRoute(req: Request, res: Response) {
-  const name = string(req.query["name"], "name");
+  const title = string(req.query["title"], "title");
   const lang = string(req.query["lang"], "lang");
-  if (name.length < 3) {
-    throw new ValidatorError("name", "minlength");
+  if (title.length < 3) {
+    throw new ValidatorError("title", "minlength");
   }
   if (lang !== "en" && lang !== "cs") {
     throw new ValidatorError("lang", "enum");
   }
 
   const episodes = await Episode.find({
-    [`name.${lang}`]: new RegExp(escapeRegExp(name), "i"),
+    [`title.${lang}`]: new RegExp(escapeRegExp(title), "i"),
   });
   res.json(
     episodes.map((episode) => {
-      return { name: episode.name[lang], id: episode._id };
+      return { title: episode.title[lang], id: episode._id };
     })
   );
 }
 
+export async function seRoute(req: Request, res: Response) {
+  const season = number(req.params["s"], "s");
+  const episode = number(req.params["e"], "e");
+
+  const ep = await Episode.findOne({
+    season,
+    episode,
+  });
+  if (ep === null) {
+    throw new NotFoundError();
+  }
+  res.json({ id: ep._id });
+}
+
 export async function getRoute(req: Request, res: Response) {
   const id = string(req.params["id"], "id");
+  const lang = string(req.query["lang"], "lang");
+  if (lang !== "en" && lang !== "cs") {
+    throw new ValidatorError("lang", "enum");
+  }
 
   const episode = await Episode.findById(Number.parseInt(id));
   if (episode === null) {
@@ -38,7 +56,14 @@ export async function getRoute(req: Request, res: Response) {
   }
 
   res.json({
-    episode,
+    title: episode.title[lang],
+    id: episode._id,
+    season: episode.season,
+    episode: episode.episode,
+    premiere: episode.premiere[lang].toISOString(),
+    directedBy: episode.directedBy,
+    writtenBy: episode.writtenBy,
+    plot: episode.plot[lang],
     watched,
   });
 }

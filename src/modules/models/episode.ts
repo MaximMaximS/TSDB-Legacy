@@ -4,13 +4,13 @@ interface IEpisode {
   _id: number;
   season: number;
   episode: number;
-  name: {
+  title: {
     en: string;
     cs: string;
   };
   directedBy: string;
   writtenBy: string;
-  premiered: {
+  premiere: {
     en: Date;
     cs: Date;
   };
@@ -34,7 +34,7 @@ const EpisodeSchema = new Schema<IEpisode, EpisodeModel>({
     type: Number,
     required: true,
   },
-  name: {
+  title: {
     en: {
       type: String,
       required: true,
@@ -52,7 +52,7 @@ const EpisodeSchema = new Schema<IEpisode, EpisodeModel>({
     type: String,
     required: true,
   },
-  premiered: {
+  premiere: {
     en: {
       type: Date,
       required: true,
