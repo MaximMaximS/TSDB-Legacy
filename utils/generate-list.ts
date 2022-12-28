@@ -64,10 +64,10 @@ function parseDate(date: string) {
   return d;
 }
 
-type NameType = "enName" | "csName" | "directedBy" | "writtenBy";
+type StringType = "enTitle" | "csTitle" | "directedBy" | "writtenBy";
 
-function nameFix(name: string) {
-  return name
+function stringFix(string: string) {
+  return string
     .replaceAll("ová", "")
     .replaceAll(" a ", ", ")
     .replace(/(?<=.)\d\. část: /g, ", ")
@@ -77,53 +77,53 @@ function nameFix(name: string) {
 }
 
 const channelRegex = /(?<= \()[^)]+(?=\))/g;
-const nameRegex = /[^ ()][^()]+(?= \()/g;
-function fixName(name: string, type: NameType): string {
-  name = name
+const titleRegex = /[^ ()][^()]+(?= \()/g;
+function fixString(string: string, type: StringType): string {
+  string = string
     .trim()
     .replace(/\s+/g, " ")
     .replace(/\[[^\]]*\d]/g, "");
   switch (type) {
-    case "enName":
-    case "csName": {
-      const channels = name.match(channelRegex);
-      const names = name.match(nameRegex);
+    case "enTitle":
+    case "csTitle": {
+      const channels = string.match(channelRegex);
+      const titles = string.match(titleRegex);
       // If not (both null or if their lengths are equal)
-      if ((channels === null) !== (names === null)) {
-        throw new Error(`wtf regex: ${name}`);
+      if ((channels === null) !== (titles === null)) {
+        throw new Error(`wtf regex: ${string}`);
       }
       if (channels === null) {
-        return name;
+        return string;
       }
-      if (names === null) {
-        throw new Error(`i luv js: ${name}`);
+      if (titles === null) {
+        throw new Error(`i luv js: ${string}`);
       }
 
-      if (channels.length !== names.length) {
-        throw new Error(`wtf regex: ${name}`);
+      if (channels.length !== titles.length) {
+        throw new Error(`wtf regex: ${string}`);
       }
 
       if (channels.length === 1) {
-        return name;
+        return string;
       }
 
       const index = channels.findIndex((channel) =>
         channel.toLowerCase().includes("prima")
       );
       if (index === -1) {
-        throw new Error(`Channel not found: ${name}`);
+        throw new Error(`Channel not found: ${string}`);
       }
-      const nm = names[index];
+      const nm = titles[index];
       if (nm === undefined) {
-        throw new Error(`Name not found: ${name}`);
+        throw new Error(`Title not found: ${string}`);
       }
       return nm;
     }
     case "directedBy": {
-      return nameFix(name);
+      return stringFix(string);
     }
     case "writtenBy": {
-      return nameFix(name);
+      return stringFix(string);
     }
   }
 }
@@ -149,13 +149,13 @@ interface Episode {
   _id: number;
   season: number;
   episode: number;
-  name: {
+  title: {
     en: string;
     cs: string;
   };
   directedBy: string;
   writtenBy: string;
-  premiered: {
+  premiere: {
     en: Date;
     cs: Date;
   };
@@ -236,28 +236,28 @@ async function processRow(row: Element, season: number) {
     throw new TypeError(`Invalid episode number: ${txt}`);
   }
 
-  const enName = fixName(tds.eq(1).text(), "enName");
-  if (enName === "") {
-    throw new TypeError(`Invalid English name: ${txt}`);
+  const enTitle = fixString(tds.eq(1).text(), "enTitle");
+  if (enTitle === "") {
+    throw new TypeError(`Invalid English title: ${txt}`);
   }
 
-  const csNameElem = tds.eq(2);
-  const link = csNameElem.find("a").attr("href");
+  const csTitleElem = tds.eq(2);
+  const link = csTitleElem.find("a").attr("href");
   if (link === undefined) {
     throw new Error(`Invalid link: ${txt}`);
   }
   const url = new URL(link, "https://cs.wikipedia.org/");
-  const csName = fixName(csNameElem.text(), "csName");
-  if (csName === "") {
+  const csTitle = fixString(csTitleElem.text(), "csTitle");
+  if (csTitle === "") {
     throw new TypeError(`Invalid Czech name: ${txt}`);
   }
 
-  const directedBy = fixName(tds.eq(3).text(), "directedBy");
+  const directedBy = fixString(tds.eq(3).text(), "directedBy");
   if (directedBy === "") {
     throw new TypeError(`Invalid directed by: ${txt}`);
   }
 
-  const writtenBy = fixName(tds.eq(4).text(), "writtenBy");
+  const writtenBy = fixString(tds.eq(4).text(), "writtenBy");
   if (writtenBy === "") {
     throw new TypeError(`Invalid written by: ${txt}`);
   }
@@ -281,13 +281,13 @@ async function processRow(row: Element, season: number) {
     _id: id,
     season,
     episode: eNo,
-    name: {
-      en: enName,
-      cs: csName,
+    title: {
+      en: enTitle,
+      cs: csTitle,
     },
     directedBy: directedBy,
     writtenBy: writtenBy,
-    premiered: {
+    premiere: {
       en: enPremiere,
       cs: csPremiere,
     },
