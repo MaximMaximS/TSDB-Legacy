@@ -17,7 +17,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: latest
+          node-version: 18
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -47,3 +47,11 @@ jobs:
           context: .
           push: true
           tags: maximmaxims/tsdb:${{ steps.package-version.outputs.current-version }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: tsdb
+          path: |
+            dist
+            package*.json
