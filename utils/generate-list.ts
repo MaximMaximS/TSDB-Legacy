@@ -244,7 +244,8 @@ async function processRow(row: Element, season: number) {
   const csTitleElem = tds.eq(2);
   const link = csTitleElem.find("a").attr("href");
   if (link === undefined) {
-    throw new Error(`Invalid link: ${txt}`);
+    return;
+    // throw new Error(`Invalid link: ${txt}`);
   }
   const url = new URL(link, "https://cs.wikipedia.org/");
   const csTitle = fixString(csTitleElem.text(), "csTitle");
