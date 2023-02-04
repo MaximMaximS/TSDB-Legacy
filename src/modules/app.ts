@@ -15,10 +15,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-if (
-  process.env["NODE_ENV"] !== "development" &&
-  process.env["NODE_ENV"] !== "test"
-) {
+if (process.env["RATELIMIT_ENABLED"] === "true") {
   // Rate limiting
   const RATELIMIT_WINDOW_MS = number(
     process.env["RATELIMIT_WINDOW_MS"],

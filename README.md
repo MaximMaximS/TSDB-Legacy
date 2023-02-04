@@ -25,6 +25,8 @@ Env configuration:
 
 ```env
 # Configure theses variables to your liking
+
+RATELIMIT_ENABLED=true
 RATELIMIT_WINDOW_MS=60000
 RATELIMIT_DELAY_AFTER=10
 RATELIMIT_DELAY_MS=500
